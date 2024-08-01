@@ -469,8 +469,8 @@ ogoki_2016 %>%
 ### 4.04 Insar dates on combined hyeto-hydrographs ----
 
 ### InSAR station subset
-insar5 <- insar_tidy %>% 
-  filter(id %in% "5247373")
+insar10 <- insar_tidy %>% 
+  filter(id %in% "4818002")
 
 ### Combined plot
 lansdowne_hist <- lansdowne_clean %>% 
@@ -483,7 +483,7 @@ lansdowne_hist <- lansdowne_clean %>%
   scale_y_reverse(limits = c(100, 0)) +
   
   # Annotations
-  geom_vline(data = insar5, aes(xintercept = date, colour = "salmon"), linetype = "dashed") +
+  geom_vline(data = insar10, aes(xintercept = date, colour = "salmon"), linetype = "dashed") +
   
   # Theme
   theme_light() +
@@ -491,7 +491,7 @@ lansdowne_hist <- lansdowne_clean %>%
         axis.text.x = element_blank(),
         axis.ticks.x = element_blank(),
         legend.position = "none") +
-  ggtitle("Historical Attawapiskat River discharge | Weather station: Lansdowne House (AUT) | InSAR ID: 5036155")
+  ggtitle("Historical Attawapiskat River discharge | Weather station: Lansdowne House (AUT) | InSAR ID: 4818002")
 
 
 attawa_hist_q <- attawapiskat_exp %>%
@@ -507,8 +507,8 @@ attawa_hist_q <- attawapiskat_exp %>%
   ylab(expression(paste("Discharge ", (m^3/s)))) +
   
   # Annotations
-  geom_vline(data = insar5, aes(xintercept = date, colour = "salmon"), linetype = "dashed") +
-  geom_text(data = insar5,
+  geom_vline(data = insar10, aes(xintercept = date, colour = "salmon"), linetype = "dashed") +
+  geom_text(data = insar10,
           mapping = aes(x = date - 21, y = 1600, label = date,),
            inherit.aes = FALSE,
             size = 3,
@@ -528,8 +528,8 @@ lansdowne_hist / attawa_hist_q
 ### 4.05 Raw Insar profile combined with corresponding sf and precip
 
 ### InSAR 1A
-insar5_plot <- insar_long %>% 
-  filter(point_id %in% "5247373") %>% 
+insar10_plot <- insar_long %>% 
+  filter(point_id %in% "4818002") %>% 
   ggplot(aes(x = date, y = displacement)) +
   
   # Point plot
@@ -540,13 +540,13 @@ insar5_plot <- insar_long %>%
   scale_x_date(limits = date_range, date_labels = "%Y", date_breaks = "1 year") +
   
   # Annotations
-  geom_vline(data = insar5, aes(xintercept = date, colour = "salmon"), linetype = "dashed") +
+  geom_vline(data = insar10, aes(xintercept = date, colour = "salmon"), linetype = "dashed") +
   
   # Theme
   theme_light() +
   theme(legend.position = "none")
 
-lansdowne_hist / attawa_hist_q / insar5_plot + plot_layout(guides = "collect")
+lansdowne_hist / attawa_hist_q / insar10_plot + plot_layout(guides = "collect")
 
 ## 5. SAVING // EXPORTING ----
 
