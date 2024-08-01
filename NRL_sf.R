@@ -10,9 +10,6 @@
 ## 0. NOTES ----
 
 ## 1. PREPARE ----
-
-download_hydat()
-
 rm(list = ls())
 options(stringsASfactors = FALSE, scipen = 999, encoding = "UTF-8")
 
@@ -38,8 +35,6 @@ attawapiskat_exp <- attawapiskat %>%
   separate_wider_delim(Date, delim = "-", names = c("year", "month", "day"), cols_remove = FALSE) %>% 
   mutate(false_date = paste("2100", month, day))
 
-attawapiskat_exp$false_date <- ymd(attawapiskat_exp$false_date)
-
 ### Unite the InSar ymd columns into one date class
 
 insar_tidy <- unite(insar_points, col = date, 2:4, sep = "-", remove = TRUE)
@@ -51,10 +46,13 @@ insar_tidy$date <- as.Date(insar_tidy$date)
 date_range <- c(as.Date("2016-01-01"), as.Date("2022-12-31"))
 
 ### 3.02 Subset Lansdowne and Ogoki precip and Attawapiskat streamflow to prep for joint hydro-hyeto plots ----
-lansdowne_2022 <- lansdowne_clean %>%
-  filter(year %in% "2022") %>% 
+
+### Run line 56 in NRL_precip.R first
+lansdowne_2016 <- lansdowne_clean %>%
+  filter(year %in% "2016") %>% 
   mutate(total_precip = coalesce(total_precip, 0)) # fill NAs with zeroes for graph purposes
 
+### Ogoki here if needed ...
 ogoki_2022 <- ogoki_clean %>% 
   filter(year %in% "2022") %>% 
   mutate(total_precip = coalesce(total_precip, 0))
@@ -528,6 +526,8 @@ attawa_hist_q <- attawapiskat_exp %>%
 lansdowne_hist / attawa_hist_q
 
 ### 4.05 Raw Insar profile combined with corresponding sf and precip
+
+### InSAR 1A
 insar1a_plot <- insar_long %>% 
   filter(point_id %in% "4997257") %>% 
   ggplot(aes(x = date, y = displacement)) +
