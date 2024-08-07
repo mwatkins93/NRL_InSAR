@@ -30,7 +30,7 @@ install.packages("lubridate")
 install.packages(c('lutz', 'sf')) # for stations() timezone updates
 
 rm(list = ls())
-options(stringsASfactors = FALSE, scipen = 999, encoding = "UTF-8", digits = 5)
+options(stringsASfactors = FALSE, scipen = 999, encoding = "UTF-8")
 
 library(tidyverse)
 library(readxl)
