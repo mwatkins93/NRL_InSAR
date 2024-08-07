@@ -9,6 +9,10 @@
 
 ## 0. NOTES ----
 
+### 0.1 Set month list for time plot x-axis ----
+
+month_list <- c("Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sep", "Oct", "Nov", "Dec")
+
 ## 1. PREPARE ----
 rm(list = ls())
 options(stringsASfactors = FALSE, scipen = 999, encoding = "UTF-8")
@@ -21,7 +25,7 @@ library(patchwork)
 
 ## 2. IMPORT ----
 
-insar_points <- read_excel(path = "./data/insar_points.xlsx")
+insar_points <- read_excel(path = "./data/insar_point_dates.xlsx")
 
 insar_profiles <- read_excel(path = "./data/raw_insar_profiles.xlsx")
 
@@ -46,6 +50,10 @@ insar_tidy$date <- as.Date(insar_tidy$date)
 date_range <- c(as.Date("2016-01-01"), as.Date("2022-12-31"))
 
 ### 3.02 Subset Lansdowne and Ogoki precip and Attawapiskat streamflow to prep for joint hydro-hyeto plots ----
+
+lansdowne_clean <- lansdowne[, c(11:14, 32)]
+
+### Only need code below for plotting section 4.01 and 4.02!
 
 ### Run line 56 in NRL_precip.R first
 lansdowne_2016 <- lansdowne_clean %>%
@@ -469,8 +477,8 @@ ogoki_2016 %>%
 ### 4.04 Insar dates on combined hyeto-hydrographs ----
 
 ### InSAR station subset
-insar5 <- insar_tidy %>% 
-  filter(id %in% "5247373")
+insar_7641 <- insar_tidy %>%
+  filter(id %in% "4937641")
 
 ### Combined plot
 lansdowne_hist <- lansdowne_clean %>% 
@@ -483,7 +491,7 @@ lansdowne_hist <- lansdowne_clean %>%
   scale_y_reverse(limits = c(100, 0)) +
   
   # Annotations
-  geom_vline(data = insar5, aes(xintercept = date, colour = "salmon"), linetype = "dashed") +
+  geom_vline(data = insar_7641, aes(xintercept = date, colour = "salmon"), linetype = "dashed") +
   
   # Theme
   theme_light() +
@@ -491,7 +499,7 @@ lansdowne_hist <- lansdowne_clean %>%
         axis.text.x = element_blank(),
         axis.ticks.x = element_blank(),
         legend.position = "none") +
-  ggtitle("Historical Attawapiskat River discharge | Weather station: Lansdowne House (AUT) | InSAR ID: 5247373")
+  ggtitle("Historical Attawapiskat River discharge | Weather station: Lansdowne House (AUT) | InSAR ID: 4937641")
 
 
 attawa_hist_q <- attawapiskat_exp %>%
@@ -507,9 +515,9 @@ attawa_hist_q <- attawapiskat_exp %>%
   ylab(expression(paste("Discharge ", (m^3/s)))) +
   
   # Annotations
-  geom_vline(data = insar5, aes(xintercept = date, colour = "salmon"), linetype = "dashed") +
-  geom_text(data = insar5,
-            mapping = aes(x = date - 21, y = 1600, label = date,),
+  geom_vline(data = insar_7641, aes(xintercept = date, colour = "salmon"), linetype = "dashed") +
+  geom_text(data = insar_7641,
+            mapping = aes(x = date - 18, y = 1600, label = date,),
             inherit.aes = FALSE,
             size = 3,
             hjust = 1,
@@ -527,9 +535,9 @@ lansdowne_hist / attawa_hist_q
 
 ### 4.05 Raw Insar profile combined with corresponding sf and precip
 
-### InSAR 1A
-insar5_plot <- insar_long %>% 
-  filter(point_id %in% "5247373") %>% 
+### InSAR 7641
+insar7641_plot <- insar_long %>% 
+  filter(point_id %in% "4937641") %>% 
   ggplot(aes(x = date, y = displacement)) +
   
   # Point plot
@@ -540,13 +548,13 @@ insar5_plot <- insar_long %>%
   scale_x_date(limits = date_range, date_labels = "%Y", date_breaks = "1 year") +
   
   # Annotations
-  geom_vline(data = insar5, aes(xintercept = date, colour = "salmon"), linetype = "dashed") +
+  geom_vline(data = insar_7641, aes(xintercept = date, colour = "salmon"), linetype = "dashed") +
   
   # Theme
   theme_light() +
   theme(legend.position = "none")
 
-lansdowne_hist / attawa_hist_q / insar5_plot + plot_layout(guides = "collect")
+lansdowne_hist / attawa_hist_q / insar7641_plot + plot_layout(guides = "collect")
 
 ## 5. SAVING // EXPORTING ----
 
