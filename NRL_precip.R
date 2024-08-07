@@ -30,7 +30,7 @@ install.packages("lubridate")
 install.packages(c('lutz', 'sf')) # for stations() timezone updates
 
 rm(list = ls())
-options(stringsASfactors = FALSE, scipen = 999, encoding = "UTF-8")
+options(stringsASfactors = FALSE, scipen = 999, encoding = "UTF-8", digits = 5)
 
 library(tidyverse)
 library(readxl)
@@ -61,9 +61,11 @@ ogoki <- weather_dl(station_ids = 52898, start = "2015-08-01", end = "2024-07-17
 
 lansdowne_clean <- lansdowne[, c(11:14, 32)]
 
+ogoki_clean <- ogoki[, c(11:14, 32)]
+
 ogoki_2016 <- ogoki[-c(1:153), ]
 
-ogoki_clean <- ogoki_2016[, c(11:14, 32)]
+ogoki_2016[, c(11:14, 32)]
 
 ## Create monthly summaries for each site
 
@@ -168,3 +170,18 @@ write_csv(ogoki_2016, file = "X:\\PROJECTS\\CURRENT\\2021-004 SNC_Northern Road 
 ## 6. TRIAL // JUNK CODE ----
 
 weathercan::flags # List of flags for precipitation
+
+### 6.01 Yearly and monthly precip totals for both climate stations ----
+
+ogoki_clean %>%
+  group_by(year) %>%
+  summarise(yearly.precip = sum(total_precip, na.rm = TRUE)) %>% 
+  as.data.frame()
+
+lansdowne_monthly <- lansdowne_clean %>% 
+  group_by(year, month) %>% 
+  summarise(monthly_precip = sum(total_precip, na.rm = TRUE))
+
+
+
+
