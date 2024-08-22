@@ -22,6 +22,7 @@ library(readxl)
 library(tidyhydat)
 library(lubridate)
 library(patchwork)
+library(RColorBrewer)
 
 ## 2. IMPORT ----
 
@@ -100,10 +101,10 @@ insar_long$date <- ymd(insar_long$date) # parse dates
 
 ### 3.04 Subset Insar test (7571, 8218, 8218, 0186) ----
 
+insar_long$point_id <- as.character(insar_long$point_id) # for plotting purposes
+
 lake_insar <- insar_long %>% 
   filter(point_id %in% c("7537571", "7548218", "7558218", "7580186"))
-
-lake_insar$point_id <- as.character(lake_insar$point_id) # change col to char for plotting purposes
 
 ### 3.05 Create monthly sums for Lansdowne precip ----
 
@@ -667,7 +668,7 @@ lansdowne_hist <- lansdowne_clean %>%
   scale_y_reverse(limits = c(100, 0), expand = expansion(mult = c(0, 0))) +
   
   # Annotations
-  geom_vline(data = insar_8218, aes(xintercept = date), linetype = "dashed") +
+  geom_vline(data = insar_2419, aes(xintercept = date), linetype = "dashed") +
   
   # Theme
   theme_light() +
@@ -691,7 +692,7 @@ attawa_hist_q <- attawapiskat_exp %>%
   ylab(expression(paste("Discharge ", (m^3/s)))) +
   
   # Annotations
-  geom_vline(data = insar_8218, aes(xintercept = date), linetype = "dashed") +
+  geom_vline(data = insar_2419, aes(xintercept = date), linetype = "dashed") +
   #geom_text(data = insar_8218, mapping = aes(x = date - 18, y = 1600, label = date,),
   #inherit.aes = FALSE,
   #size = 3,
@@ -707,8 +708,13 @@ attawa_hist_q <- attawapiskat_exp %>%
         legend.position = "none")
 
 #InSAR
-lake_insar_plot <- lake_insar %>% 
-  ggplot(aes(x = date, y = displacement, colour = point_id)) +
+
+comp_4 <- insar_long %>% 
+  filter(point_id %in% c("7562413", "7562416", "7562419"))
+
+
+comp_4_plot <- comp_4 %>% 
+  ggplot(aes(x = date, y = displacement, color = point_id)) +
   
   # Point plot
   geom_point() +
@@ -716,17 +722,15 @@ lake_insar_plot <- lake_insar %>%
   # Axes
   labs(x = "", y = "Displacement (cm)", colour = "InSAR ID") +
   scale_x_date(limits = date_range, date_labels = "%Y", date_breaks = "1 year") +
-  scale_color_discrete(breaks = c("7580186", "7537571", "7548218", "7551769")) +
+  scale_color_brewer(breaks = c("7562413", "7562416", "7562419"), palette = "Dark2") +
   
   # Annotations
-  geom_vline(data = insar_8218, aes(xintercept = date), linetype = "dashed") +
+  geom_vline(data = insar_2419, aes(xintercept = date), linetype = "dashed") +
   
   # Theme
   theme_light()
 
-lansdowne_hist / attawa_hist_q / lake_insar_plot + plot_layout(guides = "collect")
-
-  
+lansdowne_hist / attawa_hist_q / comp_4_plot + plot_layout(guides = "collect")
   
 
 
