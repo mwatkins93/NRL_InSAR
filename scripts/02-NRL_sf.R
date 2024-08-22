@@ -502,10 +502,10 @@ lansdowne_hist <- lansdowne_clean %>%
   
   # Axes
   ylab("Rainfall (mm/day)") +
-  scale_y_reverse(limits = c(200, 0)) +
+  scale_y_reverse(limits = c(100, 0), expand = expansion(mult = c(0, 0))) +
   
   # Annotations
-  geom_vline(data = insar_8218, aes(xintercept = date), linetype = "dashed") +
+  #geom_vline(data = insar_8218, aes(xintercept = date), linetype = "dashed") +
   
   # Theme
   theme_light() +
@@ -513,15 +513,15 @@ lansdowne_hist <- lansdowne_clean %>%
         axis.text.x = element_blank(),
         axis.ticks.x = element_blank(),
         legend.position = "none") +
-  ggtitle("Historical Attawapiskat River discharge | Weather station: Lansdowne House (AUT) | InSAR ID: 7558218")
+  ggtitle("Historical Attawapiskat River discharge | Weather station: Lansdowne House (AUT)")
 
 ### 4.05 Combined plot - monthly bins instead of daily amounts ----
 
 ld_monthly_plot <- lansdowne_monthly %>% 
   ggplot(aes(x = make_date(year, factor(month)), y = monthly.precip)) +
-  geom_col(fill = "darkblue",
-           alpha = 0.6,
-           position = position_dodge(width = 0.5)) +
+  geom_line() +
+  #geom_col(fill = "darkblue",
+     #      alpha = 0.6) +
   #geom_bar(stat = "identity", fill = "darkblue") +
   
   # Axes
@@ -534,10 +534,11 @@ ld_monthly_plot <- lansdowne_monthly %>%
   # Theme
   theme_light() +
   theme(axis.title.x = element_blank(),
-        axis.text.x = element_blank(),
         axis.ticks.x = element_blank(),
         legend.position = "none") +
   ggtitle("Historical Attawapiskat River discharge | Weather station: Lansdowne House (AUT)")
+
+ld_monthly_plot
 
 
 attawa_hist_q <- attawapiskat_exp %>%
@@ -592,7 +593,7 @@ lake_insar_plot <- lake_insar %>%
   # Theme
   theme_light()
 
-ld_monthly_plot / attawa_hist_q / lake_insar_plot + plot_layout(guides = "collect")
+lansdowne_hist / attawa_hist_q / lake_insar_plot + plot_layout(guides = "collect")
 
 ## 5. SAVING // EXPORTING ----
 
@@ -653,17 +654,17 @@ ld_monthly_plot <- lansdowne_monthly %>%
         legend.position = "none") +
   ggtitle("Historical Attawapiskat River discharge | Weather station: Lansdowne House (AUT)")
 
-### 6.03 Monthly rainfall combined plot workflow ----
+### 6.03 Daily rainfall combined plot workflow ----
 
-ld_monthly_plot <- lansdowne_monthly %>% 
-  ggplot(aes(x = make_date(year, factor(month)), y = monthly.precip)) +
-  geom_col(fill = "darkblue",
-           alpha = 0.6) +
-  #geom_bar(stat = "identity", fill = "darkblue") +
+# Rainfall
+lansdowne_hist <- lansdowne_clean %>% 
+  filter(date >= "2016-01-01", date <= "2022-12-31") %>% 
+  ggplot(aes(x = date, y = total_precip)) +
+  geom_bar(stat = "identity", fill = "darkblue") +
   
   # Axes
-  ylab("Monthly rainfall (mm)") +
-  scale_y_reverse(limits = c(200, 0), expand = expansion(mult = c(0, 0))) +
+  ylab("Rainfall (mm/day)") +
+  scale_y_reverse(limits = c(100, 0), expand = expansion(mult = c(0, 0))) +
   
   # Annotations
   geom_vline(data = insar_8218, aes(xintercept = date), linetype = "dashed") +
@@ -671,12 +672,12 @@ ld_monthly_plot <- lansdowne_monthly %>%
   # Theme
   theme_light() +
   theme(axis.title.x = element_blank(),
-        #axis.text.x = element_blank(),
-        #axis.ticks.x = element_blank(),
+        axis.text.x = element_blank(),
+        axis.ticks.x = element_blank(),
         legend.position = "none") +
   ggtitle("Historical Attawapiskat River discharge | Weather station: Lansdowne House (AUT)")
 
-
+# Hydrograph
 attawa_hist_q <- attawapiskat_exp %>%
   ggplot(aes(x = Date, y = Value)) +
   
@@ -690,11 +691,12 @@ attawa_hist_q <- attawapiskat_exp %>%
   ylab(expression(paste("Discharge ", (m^3/s)))) +
   
   # Annotations
-  geom_vline(data = insar_8218, aes(xintercept = date), linetype = "dashed") +       geom_text(data = insar_8218, mapping = aes(x = date - 18, y = 1600, label = date,),
-  inherit.aes = FALSE,
-  size = 3,
-  hjust = 1,
-  angle = 90) +
+  geom_vline(data = insar_8218, aes(xintercept = date), linetype = "dashed") +
+  #geom_text(data = insar_8218, mapping = aes(x = date - 18, y = 1600, label = date,),
+  #inherit.aes = FALSE,
+  #size = 3,
+  #hjust = 1,
+  #angle = 90) +
   
   # Theme
   theme_light() +
@@ -704,6 +706,7 @@ attawa_hist_q <- attawapiskat_exp %>%
         axis.title.y = element_text(vjust = 3),
         legend.position = "none")
 
+#InSAR
 lake_insar_plot <- lake_insar %>% 
   ggplot(aes(x = date, y = displacement, colour = point_id)) +
   
@@ -721,7 +724,7 @@ lake_insar_plot <- lake_insar %>%
   # Theme
   theme_light()
 
-ld_monthly_plot / attawa_hist_q / lake_insar_plot + plot_layout(guides = "collect")
+lansdowne_hist / attawa_hist_q / lake_insar_plot + plot_layout(guides = "collect")
 
   
   
