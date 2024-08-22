@@ -492,8 +492,8 @@ ogoki_2016 %>%
 ### 4.04 Insar dates on combined hyeto-hydrographs ----
 
 ### InSAR station subset (combined InSAR sites on lake)
-#insar_8218 <- insar_tidy %>%
-#  filter(id %in% "7558218")
+insar_4265 <- insar_tidy %>%
+  filter(id %in% "5004265")
 
 ### Combined plot
 lansdowne_hist <- lansdowne_clean %>% 
@@ -668,7 +668,7 @@ lansdowne_hist <- lansdowne_clean %>%
   scale_y_reverse(limits = c(100, 0), expand = expansion(mult = c(0, 0))) +
   
   # Annotations
-  geom_vline(data = insar_2419, aes(xintercept = date), linetype = "dashed") +
+  geom_vline(data = insar_4265, aes(xintercept = date), linetype = "dashed") +
   
   # Theme
   theme_light() +
@@ -692,7 +692,7 @@ attawa_hist_q <- attawapiskat_exp %>%
   ylab(expression(paste("Discharge ", (m^3/s)))) +
   
   # Annotations
-  geom_vline(data = insar_2419, aes(xintercept = date), linetype = "dashed") +
+  geom_vline(data = insar_4265, aes(xintercept = date), linetype = "dashed") +
   #geom_text(data = insar_8218, mapping = aes(x = date - 18, y = 1600, label = date,),
   #inherit.aes = FALSE,
   #size = 3,
@@ -709,11 +709,11 @@ attawa_hist_q <- attawapiskat_exp %>%
 
 #InSAR
 
-comp_4 <- insar_long %>% 
-  filter(point_id %in% c("7562413", "7562416", "7562419"))
+grp_1 <- insar_long %>% 
+  filter(point_id %in% c("5004265", "4997257", "4997256", "5088845"))
 
 
-comp_4_plot <- comp_4 %>% 
+grp_1_plot <- grp_1 %>% 
   ggplot(aes(x = date, y = displacement, color = point_id)) +
   
   # Point plot
@@ -722,15 +722,15 @@ comp_4_plot <- comp_4 %>%
   # Axes
   labs(x = "", y = "Displacement (cm)", colour = "InSAR ID") +
   scale_x_date(limits = date_range, date_labels = "%Y", date_breaks = "1 year") +
-  scale_color_brewer(breaks = c("7562413", "7562416", "7562419"), palette = "Dark2") +
+  scale_color_brewer(breaks = c("4997257", "4997256", "5004265", "5088845"), palette = "Dark2") +
   
   # Annotations
-  geom_vline(data = insar_2419, aes(xintercept = date), linetype = "dashed") +
+  geom_vline(data = insar_4265, aes(xintercept = date), linetype = "dashed") +
   
   # Theme
   theme_light()
 
-lansdowne_hist / attawa_hist_q / comp_4_plot + plot_layout(guides = "collect")
+lansdowne_hist / attawa_hist_q / grp_1_plot + plot_layout(guides = "collect")
   
 
 
