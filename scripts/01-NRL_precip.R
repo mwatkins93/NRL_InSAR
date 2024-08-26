@@ -149,7 +149,7 @@ ogoki_clean %>%
 
 ### Monthly
 ogoki_monthly %>% 
-  ggplot(aes(x = month, y = monthly_precip)) +
+  ggplot(aes(x = month, y = monthly.precip)) +
   facet_wrap(~ year) +
   
   # Bar plot
