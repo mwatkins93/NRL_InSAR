@@ -633,6 +633,3 @@ ld_monthly_plot <- lansdowne_monthly %>%
         axis.ticks.x = element_blank(),
         legend.position = "none") +
   ggtitle("Historical Attawapiskat River discharge | Weather station: Lansdowne House (AUT)")
-  
-
-

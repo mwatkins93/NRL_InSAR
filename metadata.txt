@@ -1,34 +1,4 @@
-## Plot sizing
+### Author: MGW
+### GitHub repository: https://github.com/mwatkins93/NRL_InSAR.git
+### Plot sizing: 1145w x 575h
 
-1145w x 575h
-
-## Completion status
-
-5004265 - complete
-4997257 - complete
-4997256 - complete
-5088845 - complete
-5050228 - complete
-5036155 - complete
-5247373 - complete
-5050253 - complete
-4934110 - complete
-4927070 - complete
-4912985 - complete
-4818002 - complete
-4563592 - complete
-4581153 - complete
-4937641 - complete
-4944683 - complete
-4944685 - complete
-7583717 - complete
-7583721 - complete
-7583724 - complete
-7583726 - complete
-7562413 - complete
-7562416 - complete
-7562419 - complete
-7537571 - complete
-7548218 - complete
-7551769 - complete
-7580186 - complete
