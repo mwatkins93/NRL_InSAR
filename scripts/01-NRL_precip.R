@@ -9,29 +9,35 @@
 
 ## 0. NOTES ----
 
-## See max columns of a dataframe
+### 0.1 Change preferences so you can see all the columns of a dataframe in the viewer ----
 
 rstudioapi::writeRStudioPreference("data_viewer_max_columns", 100L)
 
-## Set month list for time plot x-axis
+### 0.2 A vector for changing the display of the x-axis on the following plots to these ----
 
 month_list <- c("Jan", "Feb", "Mar", "Apr", "May", "June", "July", "Aug", "Sep", "Oct", "Nov", "Dec")
 
 ## 1. PREPARE ----
 
-# install.packages(c("tidyverse", "readxl"))
+### Remove the comments (#) and run lines 29 and 31 if you've never ran R before. These install packages needed for this analysis
+### Descriptions:
+### tidyverse - core/meta R package used for everything
+### readxl - functions for importing excel data
+### lubridate - makes working with date/times easier
+### weathercan - ECCC climate data
+### lutz and sf - for timezones. weathercan pkg requires them to work
+
+# install.packages(c("tidyverse", "readxl", "lubridate", "lutz", "sf"))
 
 # install.packages("weathercan", 
-                 repos = c("https://ropensci.r-universe.dev", 
-                           "https://cloud.r-project.org"))
+                 # repos = c("https://ropensci.r-universe.dev", 
+                 #        "https://cloud.r-project.org"))
 
-# install.packages("lubridate")
-
-# install.packages(c('lutz', 'sf')) # for stations() timezone updates
-
+### I just run these at the beginning of every R session - rm(list = ls()) clears the "Environment" tab on the right; options sets behaviour of strings to non-factor, scipen removes scientific notation and encoding sets encoding to UTf-8
 rm(list = ls())
 options(stringsASfactors = FALSE, scipen = 999, encoding = "UTF-8")
 
+### Loads packages so their functions can be used
 library(tidyverse)
 library(readxl)
 library(weathercan)
@@ -43,21 +49,22 @@ library(lubridate)
 
 ## 3. TIDY // PROCESS ----
 
-## Update stations dataframe
+### 3.01 This downloads the latest version of weathercan's station database ----
 
 stations_dl()
 
-## Search for Lansdowne House (ID = 10244) and Ogoki Post (ID = 52898)
+## 3.03 Search for Lansdowne House and Ogoki Post A to acquire their station ID used in 3.04 ----
 
-lansdowne <- stations_search("Ogoki Post")
+stations_search(name = "Lansdowne") # id: 10244
+stations_search(name = "Ogoki Post A") # id: 52898
 
-## Pull data from 01-01-2016 - recent for both stations
+## 3.04 Pull all daily data from the start of 2016 to most recent for both stations ----
 
 lansdowne <- weather_dl(station_ids = 10244, start = "2016-01-01", end = "2024-07-17", interval = "day")
 
 ogoki <- weather_dl(station_ids = 52898, start = "2015-08-01", end = "2024-07-17", interval = "day") # Ogoki is problematic - had to pull from 2015 and exclude up until 2016-01-01. Perhaps because the first half of 2016 is filled with NAs...
 
-## Clean data and extract necessary columns
+### 3.05 We only need certain columns, so this extracts the necessary columns ----
 
 lansdowne_clean <- lansdowne[, c(11:14, 32)]
 
@@ -67,43 +74,43 @@ ogoki_2016 <- ogoki[-c(1:153), ]
 
 ogoki_2016[, c(11:14, 32)]
 
-## Create monthly summaries for each site
+## 3.06 Grouping by year and month and summarising the 'monthly_precip' column to create monthly summaries for each station. Note: na.rm removes the NAs so the totals don't become NA ----
 
 ## Lansdowne
 lansdowne_monthly <- lansdowne_clean %>% 
   group_by(year, month) %>% 
-  na.omit() %>% 
-  summarise(monthly_precip = sum(total_precip))
+  summarise(monthly_precip = sum(total_precip, na.rm = TRUE))
 
 ## Ogoki  
 ogoki_monthly <- ogoki_clean %>% 
   group_by(year, month) %>% 
-  na.omit() %>% 
-  summarise(monthly_precip = sum(total_precip))
+  summarise(monthly_precip = sum(total_precip, na.rm = TRUE))
 
 ## 4. PLOTTING ----
 
-## Daily amounts - Lansdowne
+### 4.01 Daily and monthly plots for Lansdowne with ggplot2 ----
+
+### Daily
 lansdowne_clean %>% 
   ggplot(aes(x = date, y = total_precip)) +
   
   # Bar plot
   geom_bar(stat = "identity", fill = "#6aadfb") +
   
-  # Axes
+  # Axes - scale_y sets y-axis to display values 0-100; scale_x shows every year and make the labels show year with century (i.e., type 'strptime' into search bar inside the Help tab and see the formats to see why this works); labs changes the axis titles
   scale_y_continuous(limits = c(0, 100)) +
   scale_x_date(date_breaks = "1 year", date_labels = "%Y") +
   labs(x = "", y = "Daily precipitation (mm)") +
   
-  # Theme
+  # Theme - changes theme to light, adds a title and centers it
   theme_light() +
   ggtitle("Lansdowne House (AUT)") +
   theme(plot.title = element_text(hjust = 0.5))
 
-## Monthly amounts - Lansdowne
+### Monthly
 lansdowne_monthly %>% 
-  ggplot(aes(x = month, y = monthly_precip)) +
-  facet_wrap(~ year) +
+  ggplot(aes(x = month, y = monthly.precip)) +
+  facet_wrap(~ year) + # makes multiple plots separated by year
   
   # Bar plot
   geom_bar(stat = "identity", fill = "#6aadfb") +
@@ -114,14 +121,16 @@ lansdowne_monthly %>%
 
   # Theme
   theme_light() +
-  theme(strip.background = element_rect(fill = "white"),
-        strip.text = element_text(colour = "black")) +
-  scale_x_discrete(labels = month_list) +
-  ggtitle("Lansdowne House (AUT)") +
-  theme(plot.title = element_text(hjust = 0.5),
-        axis.title.y = element_text(vjust = 2.5))
+  theme(strip.background = element_rect(fill = "white"), # strip.background/strip.text changes the facet labels
+        strip.text = element_text(colour = "black"),
+        plot.title = element_text(hjust = 0.5),
+        axis.title.y = element_text(vjust = 2.5)) +
+  scale_x_discrete(labels = month_list) + # using that month list vector here for labels
+  ggtitle("Lansdowne House (AUT)")
 
-## Daily amounts - Ogoki
+### 4.02 Daily and monthly plots for Ogoki ----
+
+### Daily
 ogoki_clean %>% 
   ggplot(aes(x = date, y = total_precip)) +
     
@@ -138,7 +147,7 @@ ogoki_clean %>%
   ggtitle("Ogoki Post") +
   theme(plot.title = element_text(hjust = 0.5))
 
-## Monthly amounts - Ogoki
+### Monthly
 ogoki_monthly %>% 
   ggplot(aes(x = month, y = monthly_precip)) +
   facet_wrap(~ year) +
@@ -161,7 +170,7 @@ ogoki_monthly %>%
 
 ## 5. SAVING // EXPORTING ----
 
-## Save raw precipitation data to csv files
+### 5.01 Saving the raw precipitation variables to csv files using the write_csv function ----
 
 write_csv(lansdowne, file = "X:\\PROJECTS\\CURRENT\\2021-004 SNC_Northern Road Link\\NRL_precip_sf\\data\\lansdowne_precip.csv")
 
@@ -169,18 +178,9 @@ write_csv(ogoki_2016, file = "X:\\PROJECTS\\CURRENT\\2021-004 SNC_Northern Road 
 
 ## 6. TRIAL // JUNK CODE ----
 
-weathercan::flags # List of flags for precipitation
+### 6.01 Use this call to see all of the flags associated with the precip data to get more context about collection ----
 
-### 6.01 Yearly and monthly precip totals for both climate stations ----
-
-ogoki_clean %>%
-  group_by(year) %>%
-  summarise(yearly.precip = sum(total_precip, na.rm = TRUE)) %>% 
-  as.data.frame()
-
-lansdowne_monthly <- lansdowne_clean %>% 
-  group_by(year, month) %>% 
-  summarise(monthly_precip = sum(total_precip, na.rm = TRUE))
+weathercan::flags
 
 
 
